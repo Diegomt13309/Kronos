@@ -26,6 +26,20 @@
     </security-role>-->
     
     
+      <servlet>   
+        <servlet-name>listAccord</servlet-name>
+        <jsp-file>/listAccord.jsp</jsp-file>
+    </servlet>
+    
+      <servlet>   
+        <servlet-name>changeAccord</servlet-name>
+        <jsp-file>/changeAccord.jsp</jsp-file>
+    </servlet>
+    
+    <servlet>   
+        <servlet-name>addAccord</servlet-name>
+        <jsp-file>/addAccord.jsp</jsp-file>
+    </servlet>
     <servlet>   
         <servlet-name>index</servlet-name>
         <jsp-file>/index.jsp</jsp-file>
@@ -43,5 +57,22 @@
         <servlet-name>login</servlet-name>
         <url-pattern>/login</url-pattern>
     </servlet-mapping>
+      <servlet-mapping>
+        <servlet-name>addAccord</servlet-name>
+        <url-pattern>/addAccord</url-pattern>
+    </servlet-mapping>
     
+      <servlet-mapping>
+        <servlet-name>listAccord</servlet-name>
+        <url-pattern>/listAccord</url-pattern>
+    </servlet-mapping>
+    
+          <servlet-mapping>
+        <servlet-name>changeAccord</servlet-name>
+        <url-pattern>/changeAccord</url-pattern>
+    </servlet-mapping>
+    
+    <session-config>
+         <session-timeout>-1</session-timeout>
+ </session-config>
 </web-app>

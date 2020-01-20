@@ -105,7 +105,7 @@ function getUrlVars() {
 function ready() {
     console.log(sessionStorage.ROLE);
     if (sessionStorage.ROLE === undefined)
-        window.location.replace('/Kronos/login.jsp');
+        window.location.replace('/Kronos/login');
 
 
     setTypeOptions();
@@ -307,7 +307,7 @@ function editAccord(accord) {
     let deleteButton = document.getElementById('deleteButton');
     let pageTitle = document.getElementById('prinTitle');
     let divSwitch = document.getElementById('divSwitch');
-
+    //let addPdfButton=document.getElementById('addPdfButton');
     pageTitle.innerHTML = "";
     pageTitle.innerHTML = 'Modificar Acuerdo';
     title.innerHTML = "";
@@ -337,8 +337,9 @@ function editAccord(accord) {
         okButton.disabled = true;
         divDeleteButton.style.visibility = 'hidden';
         divSwitch.style.visibility = 'hidden';
-        comboTypes.disabled=true;
-        
+        comboTypes.disabled = true;
+
+
 
     } else {
         observations.value = accord.observations;
@@ -357,7 +358,8 @@ function editAccord(accord) {
         okButton.innerHTML = "Modificar Acuerdo";
         deleteButton.onclick = deleteAccord;
         divDeleteButton.style.visibility = 'visible';
-        comboTypes.disabled=true;
+       // addPdfButton.style.visibility = 'visible';
+        comboTypes.disabled = true;
         console.log(okButton);
 
 
@@ -553,16 +555,23 @@ function deletedPdf(oldArray, newArray) {
 
 
 function editButton() {
+    if (confirm("¿Seguro que desea modificar el acuerdo? ")){
     let newAccord = getNewAccord();
-    let noError = compareAccords(oldAccord, newAccord);
-    oldAccord = null;
-    oldURL = null;
-    if (!noError)
-        alert("Ha Ocurrido un error");
-    else
-        alert("Acuerdo Actualizado Correctamente");
+            compareAccords(oldAccord, newAccord).then(() => {
+    alert("Acuerdo Actualizado Correctamente");
+            oldAccord = null;
+            oldURL = null;
+            window.location.replace("/Kronos/listAccord")
+            console.log("NO ERROR");
+    }).catch(() => {
+    console.log("ERRORRR");
+            alert("Ha Ocurrido un error");
+            oldAccord = null;
+            oldURL = null;
+            window.location.replace("/Kronos/listAccord")
+    })
 
-    window.location.replace("/Kronos/listAccord.jsp");
+    }
 
 }
 function getNewAccord() {
@@ -594,36 +603,37 @@ function getNewAccord() {
     return newAccord;
 }
 function compareAccords(oldAccord, newAccord) {
-    var noError = true;
 
-    if (oldAccord.sessionDate !== newAccord.sessionDate)
-        updateSessionDate(newAccord, () => noError = false);
 
-    if (oldAccord.deadline !== newAccord.deadline)
-        updateDeadline(newAccord, () => noError = false);
+    return new Promise((resolve, reject) => {
+
+        if (oldAccord.sessionDate !== newAccord.sessionDate)
+            updateSessionDate(newAccord,data=>resolve(data),err => reject(err));
+
+        if (oldAccord.deadline !== newAccord.deadline)
+            updateDeadline(newAccord,data=>resolve(data),err => reject(err));
 
 //    if(oldAccord.notificationDate !== newAccord.notificationDate)
 //        noError=updateNotDate(newAccord);
 //    
-    if(oldAccord.observation !== newAccord.observations)
-       updateObservations(newAccord,()=> noError=false);
+        if (oldAccord.observations !== newAccord.observations)
+            updateObservations(newAccord,data=>resolve(data) ,err => reject(err));
 
-    if (oldAccord.type !== newAccord.type)
-        updateType(newAccord, () => noError = false);
+        if (oldAccord.type !== newAccord.type)
+                updateType(newAccord,data=>resolve(data) ,err => reject(err));
 
-    if (oldAccord.state !== parseInt(newAccord.state, 10))
-        updateState(newAccord, () => noError = false);
+        if (oldAccord.state !== parseInt(newAccord.state, 10))
+                updateState(newAccord,data=>resolve(data),err => reject(err));
 
-    if (oldURL.length > 0)
-        updateDeletedPdf(newAccord, oldURL, () => noError = false);
+        if (oldURL.length > 0)
+                updateDeletedPdf(newAccord,data=>resolve(data),oldURL,err => reject(err));
 
-  
-    return noError;
+    });
 
 }
 
-const updateObservations= (newAccord,callback)=>{
-      let url = 'api/accord/updateObservations/'+newAccord.accNumber;
+const updateObservations = (newAccord,succ ,callback) => {
+    let url = 'api/accord/updateObservations/' + newAccord.accNumber;
 
     $.ajax({
         type: "POST",
@@ -631,75 +641,64 @@ const updateObservations= (newAccord,callback)=>{
         contentType: " text/plain; charset=utf-8",
         data: newAccord.observations,
         url: url,
-        success: function (msg) {
-            console.log("SUCCESS");
-        },
+        success:succ,
         error: callback
 
     });
 }
-function updateSessionDate(newAccord, callback) {
+function updateSessionDate(newAccord,succ, callback) {
     let url = 'api/accord/updateSessionDate/' + newAccord.accNumber + '/' + newAccord.sessionDate;
     $.ajax({
         type: "POST",
         async: false,
         url: url,
-        success: function (msg) {
-            console.log("SUCCESS");
-        },
+        success:succ,
         error: callback
 
     });
 }
 
 
-function updateDeadline(newAccord, callback) {
+function updateDeadline(newAccord,succ,callback) {
     let url = 'api/accord/updateDeadline/' + newAccord.accNumber + '/' + newAccord.deadline;
     $.ajax({
         type: "POST",
         async: false,
         url: url,
-        success: function (msg) {
-            console.log("SUCCESS");
-        },
+        success:succ,
         error: callback
 
     });
 }
 
-function updateType(newAccord, callback) {
+function updateType(newAccord, succ, callback) {
     let url = 'api/accord/updateType/' + newAccord.accNumber + '/' + newAccord.type;
 
     $.ajax({
         type: "POST",
         async: false,
         url: url,
-        success: function (msg) {
-            console.log("SUCCESS");
-        },
+        success:succ,
         error: callback
 
     });
 }
 
 
-function updateState(newAccord, callback) {
+function updateState(newAccord, succ,callback) {
     let url = 'api/accord/updateState/' + newAccord.accNumber + '/' + newAccord.state;
 
     $.ajax({
         type: "POST",
-        async: false,
         url: url,
-        success: function (msg) {
-            console.log("SUCCESS");
-        },
+        success:succ,
         error: callback
 
     });
 
 }
 
-function updateDeletedPdf(newAccord, oldURL, callback) {
+function updateDeletedPdf(newAccord, oldURL, succ,callback) {
     let url = 'api/accord/deletePDF/' + newAccord.accNumber;
 
     var noError = true;
@@ -710,9 +709,7 @@ function updateDeletedPdf(newAccord, oldURL, callback) {
         contentType: "application/json",
         data: JSON.stringify(oldURL),
 
-        success: function (msg) {
-            console.log(msg);
-        },
+        success:succ,
         error: callback
 
     });
@@ -732,7 +729,7 @@ function deleteAccord() {
                 oldAccord = null;
                 oldURL = null;
                 alert("Acuerdo Eliminado Correctamente");
-                window.location.replace("/Kronos/listAccord.jsp");
+                window.location.replace("/Kronos/listAccord");
             },
             error: function (msg) {
                 console.log(msg);

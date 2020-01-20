@@ -27,3 +27,4 @@ hs_err_pid*
 /DataBase/DataBaseLib/dist/
 nbproject/
 build/
+dist/

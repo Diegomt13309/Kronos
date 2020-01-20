@@ -22,10 +22,25 @@ function login(){
         success: function (user_role) {
             sessionStorage.USER= user_role.user.tempUser;
             sessionStorage.ROLE=user_role.role;
-         if(document.referrer==='http://localhost:8080/Kronos/addAccord.jsp' && user_role.role==='Concejo Municipal')
-              window.location.replace("/Kronos/addAccord.jsp");
-          else
-             window.location.replace("/Kronos/index.jsp"); 
+            if(sessionStorage.ROLE==='Secretaria de Alcaldia'){
+                  mainSW().then(()=>{
+                      window.location.replace("/Kronos/index"); 
+                  });
+                
+               
+  
+            }
+          
+            else{
+                  if (document.referrer === 'http://localhost:8080/Kronos/addAccord.jsp' && user_role.role === 'Concejo Municipal')
+                    window.location.replace("/Kronos/addAccord");
+                else
+                    window.location.replace("/Kronos/index"); 
+            }
+            
+
+         
+         
       },
         error: function (response) {
             document.getElementById('alertDiv').style.display='block';
@@ -38,5 +53,5 @@ function login(){
 function logout(){
    delete sessionStorage.USER;
    delete sessionStorage.ROLE;
-   window.location.replace("/Kronos/index.jsp"); 
+   window.location.replace("/Kronos/index"); 
 }

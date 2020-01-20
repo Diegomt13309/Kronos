@@ -245,7 +245,7 @@ DELIMITER $$
 USE `KRONOS`$$
 create procedure getUserRole( in _user varchar(45), in _password varchar(100))
 begin
-SELECT USER_NAME, ROLE_NAME, T_USER.DEPARTMENT FROM T_USERROLE,T_USER WHERE T_USERROLE.USER_NAME=_user AND (T_USER.T_TEMPUSER=_user
+SELECT USER_NAME, ROLE_NAME, T_USER.DEPARTMENT FROM T_USERROLE,T_USER WHERE T_USERROLE.USER_NAME=_user AND (T_USER.TEMPUSER=_user
 AND T_USER.PASSWORD=_password); 
 end$$
 DELIMITER ;
@@ -257,7 +257,7 @@ DELIMITER $$
 USE `KRONOS`$$
 create procedure getUser( in _user varchar(45), in _password varchar(100))
 begin
-SELECT T_TEMPUSER, PASSWORD, DEPARTMENT FROM T_USER WHERE T_TEMPUSER=_user AND PASSWORD=_password; 
+SELECT TEMPUSER, PASSWORD, DEPARTMENT FROM T_USER WHERE TEMPUSER=_user AND PASSWORD=_password; 
 end$$
 DELIMITER ;
 
@@ -310,6 +310,30 @@ end$$
 DELIMITER ;
 
 USE `KRONOS`;
+DROP procedure IF EXISTS isActInDB;
+DELIMITER $$
+USE `KRONOS`$$
+create procedure isActInDB(in mydate date)
+begin
+SELECT SESSIONDATE from T_ACT where SESSIONDATE=mydate;
+end$$
+DELIMITER ;
+
+
+
+USE `KRONOS`;
+DROP procedure IF EXISTS insertTempAct;
+DELIMITER $$
+USE `KRONOS`$$
+create procedure insertTempAct(in mydate date)
+begin
+INSERT INTO T_ACT (SESSIONDATE) values (mydate);
+COMMIT;
+end$$
+DELIMITER ;
+
+
+USE `KRONOS`;
 DROP procedure IF EXISTS deletePdf;
 DELIMiTER $$
 USE `KRONOS`$$
@@ -333,13 +357,34 @@ begin
 end$$ 
 DELIMITER ;
 
-USE `KRONOS`;
-DELIMITER ;
-CREATE TABLE IF NOT EXISTS `KRONOS`.`T_DELETEDACCORDS`(
-ACCORDNUMBER varchar(45) NOT NULL,
-USER varchar(45) NOT NULL,
-Date DATETIME NOT NULL	
-);
 
+
+insert into T_TYPE (ID, DESCRIPTION) values ('A', 'Administración Municipal');
+insert into T_TYPE (ID, DESCRIPTION) values ('B', 'Auditoria Interna');
+insert into T_TYPE (ID, DESCRIPTION) values ('C', 'Lic');
+insert into T_TYPE (ID, DESCRIPTION) values ('D', 'Obras');
+insert into T_TYPE (ID, DESCRIPTION) values ('E', 'Plan Regulador');
+insert into T_TYPE (ID, DESCRIPTION) values ('F', 'Hacienda');
+insert into T_TYPE (ID, DESCRIPTION) values ('G', 'Juridicos');
+insert into T_TYPE (ID, DESCRIPTION) values ('H', 'Sociales');
+insert into T_TYPE (ID, DESCRIPTION) values ('I', 'Ambiente');
+insert into T_TYPE (ID, DESCRIPTION) values ('J', 'Varios');
+
+
+insert into T_STATE (ID, DESCRIPTION)values (0, 'Cumplido');
+insert into T_STATE (ID, DESCRIPTION)values (1, 'Incumplido');
+insert into T_STATE (ID, DESCRIPTION)values (2, 'Pendiente');
+insert into T_STATE (ID, DESCRIPTION)values (3, 'Recibido');
+insert into T_STATE (ID, DESCRIPTION)values (4, 'Desestimado');
+
+insert into T_TEMPUSER(NAME,EMAIL) values ('Concejo Municipal','concejomunicipal@sanpablo.go.cr');
+insert into T_TEMPUSER(NAME,EMAIL) values ('Secretaria de Alcaldia','alcaldia@sanpablo.go.cr');
+insert T_DEPARTMENT (ID,NAME) values (1,'SUPERUSER');
+insert into T_USER (TEMPUSER,PASSWORD,DEPARTMENT) values ('concejomunicipal@sanpablo.go.cr',SHA2('concejo',256),1);
+insert into T_USER (TEMPUSER,PASSWORD,DEPARTMENT) values ('alcaldia@sanpablo.go.cr',SHA2('alcaldia',256),1);
+insert into T_ROLE values ('Concejo Municipal');
+insert into T_ROLE values ('Secretaria de Alcaldia');
+insert into T_USERROLE (USER_NAME,ROLE_NAME) values ('concejomunicipal@sanpablo.go.cr','Concejo Municipal');
+insert into T_USERROLE (USER_NAME,ROLE_NAME) values ('alcaldia@sanpablo.go.cr','Secretaria de Alcaldia');
 
 

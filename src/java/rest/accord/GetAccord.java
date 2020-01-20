@@ -22,6 +22,7 @@ import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Locale;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.NotAcceptableException;
 import javax.ws.rs.POST;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response.ResponseBuilder;
@@ -328,12 +329,14 @@ public class GetAccord {
             @PathParam("state") int state) {
 
         try {
+
             Dao.getDao().updateAccordState(accNumber, state);
             ResponseBuilder response = Response.ok("Estado Actualizado");
             return response.build();
 
         } catch (Exception e) {
-            throw new NotFoundException();
+         ResponseBuilder response = Response.status(500);
+         return response.build();
         }
 
     }

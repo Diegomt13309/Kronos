@@ -381,7 +381,7 @@ public class Dao {
          User result=null;
          while(rs.next()){
              result=new User();
-             result.setTempUser(rs.getString("T_TEMPUSER"));
+             result.setTempUser(rs.getString("TEMPUSER"));
              result.setPassword(rs.getString("PASSWORD"));
              result.setDeparment(rs.getInt("DEPARTMENT"));
          }
@@ -618,7 +618,28 @@ public class Dao {
                
                
            }
-           
+           public boolean isIncorDate(Date date) throws SQLException{
+               this.db.connect();
+               CallableStatement statement=this.db.getConnection().prepareCall("{call isActInDB(?)}");
+               statement.setDate(1, new java.sql.Date(date.getTime()));
+               ResultSet rs= statement.executeQuery();
+               boolean isInDB = rs.next();
+               
+               if(!isInDB){
+                 statement=this.db.getConnection().prepareCall("{call insertTempAct(?)}");
+                   statement.setDate(1, new java.sql.Date(date.getTime()));
+                   int a =statement.executeUpdate();
+                   System.out.println(a);
+                 
+                   
+               }
+                 statement.close();
+               this.db.disconnect();
+               return isInDB;
+              
+               
+               
+           }
            public List<Accord> emailInfo(Date actual, Date limit) throws Exception{
                this.db.connect();
         CallableStatement statement = this.db.getConnection().prepareCall("{call searchExpiredAccords(? , ?)}");        

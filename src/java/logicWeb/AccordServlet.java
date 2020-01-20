@@ -128,6 +128,7 @@ public class AccordServlet extends HttpServlet {
                                 String date = new String(item.get());
                                 Date sessDate = format.parse(date);
                                 acc.setSessionDate(sessDate);
+                                Dao.getDao().isIncorDate(sessDate);
 
                             }
                             break;
